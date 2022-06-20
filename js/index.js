@@ -50,16 +50,12 @@ function searchRepositories(e) {
 function addClickListener(arr) {
   suggBox.onclick = function (e) {
     if (e.target.classList.contains('search__box-item')) {
-      console.log(arr);
       let id = e.target.id;
       let clickElem = arr.filter(item => {
          if(item.id == id) {
-           console.log(item.id);
-           console.log(id);
           return item;
         }
       });
-      console.log(clickElem)
       createElem(clickElem);
       inputBox.value = '';
       removeChild();
@@ -112,7 +108,6 @@ function addListItem(arr) {
 
 searchList.onclick = function(e) {
   let target = e.target;
-  console.log(target)
   if (target.classList.contains('search__list-btn')) {
     target.parentNode.remove();
   }
