@@ -1,7 +1,7 @@
-let searchWrapper = document.querySelector('.search__form');
-let inputBox = searchWrapper.querySelector('.search__input');
-let suggBox = searchWrapper.querySelector('.search__box');
-let searchList = document.querySelector('.search__list');
+const searchWrapper = document.querySelector('.search__form');
+const inputBox = searchWrapper.querySelector('.search__input');
+const suggBox = searchWrapper.querySelector('.search__box');
+const searchList = document.querySelector('.search__list');
 
 const debounce = (fn, debounceTime) => {
   let timeout;
@@ -15,46 +15,38 @@ const debounce = (fn, debounceTime) => {
 };
 
 function searchRepositories(e) {
-  let repData = e.target.value;
-  let mainArr = [];
-  if (repData) {
-    search(repData).then(data => {
+  const searchRepositoriesName = e.target.value;
+  if (searchRepositoriesName) {
+    search(searchRepositoriesName)
+    .then(data => {
       return data.items;
-    }).then(items => {
-      let itemsArr = items.filter(item => {
-        return item.name.toLocaleLowerCase().startsWith(repData.toLocaleLowerCase());
-      });
-      return itemsArr;
-    }).then(arr => {
-      for (let i = 0; i < 5; i++) {
-        if (arr[i] != undefined) {
-          mainArr.push(arr[i]);
-        } else {
-          return mainArr;
-        }
-      }
-      return mainArr;
-    }).then(arr => {
-      if (suggBox.children.length != 0) {
-        removeChild();
-      }
-      addListItem(arr);
-      addClickListener(arr);
-    });
+    })
+    .then(items => {
+      const itemsArr = items.filter(item => {
+        return item.name.toLocaleLowerCase().startsWith(searchRepositoriesName.toLocaleLowerCase());
+      }).slice(0, 5);
+      checkListItem(itemsArr);
+    })
   } else {
     inputBox.value = '';
     removeChild();
   }
 }
 
+function checkListItem(arr){
+  if (suggBox.children.length != 0) {
+    removeChild();
+  }
+  addListItem(arr);
+  addClickListener(arr);
+}
+
 function addClickListener(arr) {
   suggBox.onclick = function (e) {
     if (e.target.classList.contains('search__box-item')) {
-      let id = e.target.id;
-      let clickElem = arr.filter(item => {
-         if(item.id == id) {
-          return item;
-        }
+      const id = e.target.id;
+      const clickElem = arr.filter(item => {
+        return item.id === Number(id);
       });
       createElem(clickElem);
       inputBox.value = '';
@@ -63,14 +55,13 @@ function addClickListener(arr) {
   }
 }
 
-
 function createElem(elem) {
-  let listItem = document.createElement('div');
+  const listItem = document.createElement('div');
   listItem.classList.add('search__list-item');
   listItem.innerHTML = `
         <div class="search__list-info">
           <div class="search__list-wrapper">
-              <div class="search__list-text">Name:</div> \s
+              <div class="search__list-text">Name:</div> 
               <div class="search__list-name">${elem[0].name}</div>
           </div>
           <div class="search__list-wrapper">
@@ -89,25 +80,25 @@ function createElem(elem) {
 }
 
 function removeChild() {
-  let childrenArr = [...suggBox.children];
-  for (let i = 0; i < childrenArr.length; i++) {
-    childrenArr[i].remove();
-  }
+  const childrenArr = [...suggBox.children];
+  childrenArr.forEach(elem => {
+    elem.remove()
+  })
 }
 
 function addListItem(arr) {
   searchWrapper.classList.add('search__form--active');
-  for (let i = 0; i < arr.length; i++) {
-    let li = document.createElement('li');
+  arr.forEach(elem => {
+    const li = document.createElement('li');
     li.classList.add('search__box-item');
-    li.setAttribute('id', arr[i].id);
-    li.textContent = arr[i].name;
+    li.setAttribute('id', elem.id);
+    li.textContent = elem.name;
     suggBox.append(li);
-  }
+  })
 }
 
 searchList.onclick = function(e) {
-  let target = e.target;
+  const target = e.target;
   if (target.classList.contains('search__list-btn')) {
     target.parentNode.remove();
   }
@@ -120,6 +111,5 @@ async function search(item) {
 }
 
 inputBox.addEventListener('keyup', debounce(searchRepositories, 200));
-
 
 
